@@ -1,0 +1,135 @@
+\documentclass[12pt]{article}
+\usepackage{titlesec}
+\usepackage{subcaption}
+\usepackage[scaled]{helvet}  \renewcommand\familydefault{\sfdefault} % Font
+\usepackage{graphicx} % Required for inserting images
+\usepackage{geometry}
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=red]{hyperref}
+\usepackage{pgfplotstable}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{tikz} 
+\usetikzlibrary{petri,arrows.meta}
+\geometry{a4paper, total={170mm,257mm},left=20mm, top=20mm,}
+\usepackage[listings,breakable,skins]{tcolorbox}
+% declare our code block environment
+  \newtcblisting{tcbcodeblock}[1]{%
+    enhanced,
+    sharp corners,
+    colframe=black,
+    coltext=codefg,
+    colback=codebg,
+    breakable,
+    size=fbox,
+    listing only,
+    listing options={%
+      style=tcblatex,
+      language={#1},
+      showspaces=false,
+      showstringspaces=false,
+      commentstyle=\color{codegray},
+      keywordstyle=\color{codegreen},
+      stringstyle=\color{codecyan},
+      basicstyle=\ttfamily\footnotesize
+    }
+  }
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\alph{subsubsection}.}
+
+\titleformat{\section}{\normalfont\LARGE\bfseries}{\thesection.}{10pt}{}
+\titleformat{\subsection}{\normalfont\Large}{\thesubsection.}{10pt}{}
+\titleformat{\subsubsection}{\normalfont\large}{\thesubsubsection}{10pt}{}
+
+\begin{document}
+\thispagestyle{empty} %Suppress number of this page
+\begin{center}
+    \vspace{7pt}
+    \fontsize{18pt}{17pt}\selectfont 
+    \textbf{University of Science and Technology of Hanoi}
+    \vspace{7pt}
+\end{center}
+\vspace{10pt}
+\begin{center}
+    \includegraphics[scale=0.4]{USTH.png}
+\end{center}
+
+\vspace{90pt}
+
+\begin{center}
+    \fontsize{30pt}{17pt}\selectfont 
+    \textbf{Subject} 
+    \vspace{50pt}
+
+    \fontsize{20pt}{17pt}\selectfont 
+    \textbf{Advanced programming HPC Labwork 4}
+    \vspace{50pt}
+
+
+    \fontsize{17pt}{17pt}\selectfont
+    \textbf{{Student id: }{ict2440050}}
+    \vspace{15pt}
+
+    \fontsize{17pt}{17pt}\selectfont
+    \textbf{{Student name: }{Nguyen Vu Bach}}
+    \vspace{15pt}
+    
+\end{center}
+
+\newpage
+\setcounter{page}{1} % Start number from this page
+\section{Load image}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Original.png}
+    \caption{Original image}
+    \label{fig:placeholder}
+\end{figure}
+
+The image shape \((1065, 1600, 3)\) is downloaded from a random place on the internet as JPG and loaded using \(matplotlib.pyplot.imread\). 
+
+\section{Improvement from previous code}
+\subsection{Previous work}
+The previous code which apply GPU, 1 Dimension and block size of 256 achieved 0.0790 seconds.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{GPU.png}
+    \caption{Grayscale image}
+    \label{fig:placeholder}
+\end{figure}
+
+\newpage
+\subsection{Improvement}
+Grayscale using equation from \href{https://stackoverflow.com/questions/69424054/converting-bgr-image-to-grayscale-using-numpy}{stackoverflow} with 2D \(x, y = cuda.grid(2)\), the equation state as follow:
+\begin{equation}
+    img\_gray = (0.2989 * r + 0.5870 * g + 0.1140 * b)
+\end{equation}
+
+
+\section{Experiment with multiple different 2D blocks size}
+I experiment with different 2D block sizes [(4, 4), (8, 8), (16, 8), (16, 16), (32, 16), (32, 32)]. And speed up is compute by:
+\begin{equation}
+    speedups = \frac{1D\_time}{2D\_time}
+\end{equation}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.75\linewidth]{Plot.png}
+    \caption{2D block size speed up}
+\end{figure}
+
+\begin{itemize}
+    \item \((4x4)\) perform poorly due to excessive overhead from launching many blocks
+    \item \((8, 8), (16, 16)\) align well with GPU warp sizes, these blocks size have a good balance for this image size
+    \item The non-square \((16,8)\) shape may align well with the image dimensions or GPU memory access patterns which is better performance than \((16, 16)\)
+
+\end{itemize}
+
+\end{document}
+
+
+
+
+
+
+
